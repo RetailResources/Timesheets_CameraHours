@@ -102,6 +102,19 @@ export function summarizeEmployees(rows) {
   }));
 }
 
+/** Totals of hours (numbers) and durations (formatted H:MM) across rows, keyed by column. */
+export function totalRows(rows) {
+  const t = { hoursScheduled: 0, hoursWorked: 0 };
+  const mins = { totalTime: 0, showroomTime: 0, backroomTime: 0 };
+  for (const r of rows) {
+    t.hoursScheduled += Number(r.hoursScheduled) || 0;
+    t.hoursWorked += Number(r.hoursWorked) || 0;
+    for (const k in mins) mins[k] += durationToMinutes(r[k]) || 0;
+  }
+  for (const k in mins) t[k] = formatMinutes(mins[k]);
+  return t;
+}
+
 function formatMinutes(minutes) {
   return `${Math.floor(minutes / 60)}:${String(minutes % 60).padStart(2, "0")}`;
 }

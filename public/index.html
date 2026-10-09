@@ -17,6 +17,7 @@
     table { border-collapse: collapse; width: 100%; white-space: nowrap; }
     th, td { padding: 6px 10px; border-bottom: 1px solid #e5e7eb; text-align: left; }
     th { position: sticky; top: 0; background: #e5e7eb; cursor: pointer; user-select: none; }
+    tfoot td { position: sticky; bottom: 0; background: #e5e7eb; font-weight: 600; }
     td.num { text-align: right; font-variant-numeric: tabular-nums; }
     td.blank { color: #9ca3af; }
     tbody tr:hover { background: #f9fafb; }
@@ -25,8 +26,8 @@
 <body>
   <header><h1 id="title">Employee Timesheets &amp; Camera Hours</h1></header>
   <div class="bar">
-    <button id="employee-mode" type="button" aria-pressed="true">Employee mode</button>
-    <button id="district-mode" type="button" aria-pressed="false">District mode</button>
+    <button id="employee-mode" type="button" aria-pressed="true">Employee Details</button>
+    <button id="district-mode" type="button" aria-pressed="false">Employee Summary</button>
     <label id="employee-filter">Employee <input id="employee" type="search" placeholder="Search name"></label>
     <label id="district-filter" hidden>District <select id="district"><option value="">All districts</option></select></label>
     <label id="store-filter" hidden>Store <select id="store"><option value="">All stores</option></select></label>
@@ -36,7 +37,7 @@
     <button id="clear" type="button">Clear</button>
     <span id="count"></span>
   </div>
-  <div class="wrap"><table><thead><tr id="head"></tr></thead><tbody id="body"></tbody></table></div>
-  <script type="module" src="app.js"></script>
+  <div class="wrap"><table><thead><tr id="head"></tr></thead><tbody id="body"></tbody><tfoot id="foot"></tfoot></table></div>
+  <script type="module" src="app.js?v=3"></script>
 </body>
 </html>
