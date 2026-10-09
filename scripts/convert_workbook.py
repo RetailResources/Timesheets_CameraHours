@@ -1,18 +1,26 @@
 #!/usr/bin/env python3
-"""Convert the Shiftlab sheet of Employee_Timesheets_App.xlsx to data/timesheets.json.
+"""Build data/timesheets.json from two raw reports in the repo root:
 
-Usage: pip install openpyxl && python3 scripts/convert_workbook.py
+  AttendanceReport.xlsx - shift lab data (no camera columns)
+  CameraReport.xlsx     - camera data; Employee looks like "NAME (12345)"
+
+Camera columns are matched to attendance rows by employee name + date.
+
+Usage: pip install openpyxl && python3 scripts/convert_workbook.py [attendance.xlsx camera.xlsx]
 """
 import datetime as dt
 import json
 import pathlib
+import re
+import sys
 import warnings
 
 import openpyxl
 
 warnings.filterwarnings("ignore")
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-SRC = ROOT / "Employee_Timesheets_App.xlsx"
+ATTENDANCE = ROOT / "AttendanceReport.xlsx"
+CAMERA = ROOT / "CameraReport.xlsx"
 OUT = ROOT / "data" / "timesheets.json"
 
 FIELDS = {
@@ -22,6 +30,9 @@ FIELDS = {
     "Actual In": "actualIn", "Actual Out": "actualOut",
     "Hours Scheduled": "hoursScheduled", "Hours Worked": "hoursWorked",
     "Breaks": "breaks", "Break Minutes": "breakMinutes", "Event": "event",
+    "Break": "breakTime", "Monitored": "monitored",
+}
+CAMERA_FIELDS = {
     "Camera In": "cameraIn", "Camera Out": "cameraOut",
     "Total Time": "totalTime", "Showroom Time": "showroomTime",
     "Backroom Time": "backroomTime", "Break": "breakTime", "Monitored": "monitored",
@@ -40,17 +51,55 @@ def conv(v):
     return v
 
 
-def main():
-    ws = openpyxl.load_workbook(SRC, data_only=True)["Shiftlab"]
+def norm_name(v):
+    """'DANA GLASS (112301)' -> 'DANA GLASS' (case/space-insensitive)."""
+    name = re.sub(r"\s*\(\s*\d+\s*\)\s*$", "", str(v or ""))
+    return " ".join(name.split()).upper()
+
+
+def read_sheet(path):
+    ws = openpyxl.load_workbook(path, data_only=True).worksheets[0]
     rows = ws.iter_rows(values_only=True)
     headers = [str(h).strip() if h else "" for h in next(rows)]
+    return headers, rows
+
+
+def read_camera(path):
+    headers, rows = read_sheet(path)
+    # Prefer the column whose values carry the employee number; any name column works since numbers are stripped.
+    name_cols = [i for i, h in enumerate(headers) if h.lower().startswith("employee")]
+    date_col = headers.index("Date")
+    lookup = {}
+    for r in rows:
+        rec = {CAMERA_FIELDS[h]: conv(v) for h, v in zip(headers, r) if h in CAMERA_FIELDS}
+        date = conv(r[date_col])
+        names = [norm_name(r[i]) for i in name_cols if r[i]]
+        if not names or not date:
+            continue
+        # Use the first name column for the key; fall back to the others if absent.
+        key = (names[-1], str(date)[:10])
+        lookup.setdefault(key, rec)
+        lookup.setdefault((names[0], str(date)[:10]), rec)
+    return lookup
+
+
+def main():
+    att = pathlib.Path(sys.argv[1]) if len(sys.argv) > 2 else ATTENDANCE
+    cam = pathlib.Path(sys.argv[2]) if len(sys.argv) > 2 else CAMERA
+    camera = read_camera(cam)
+    headers, rows = read_sheet(att)
     out = []
     for r in rows:
         rec = {FIELDS[h]: conv(v) for h, v in zip(headers, r) if h in FIELDS}
         if rec.get("employee") and rec.get("date"):
+            match = camera.get((norm_name(rec["employee"]), str(rec["date"])[:10]), {})
+            for k, v in match.items():
+                rec.setdefault(k, v)
+            for k in CAMERA_FIELDS.values():
+                rec.setdefault(k, None)
             out.append(rec)
     OUT.write_text(json.dumps(out, separators=(",", ":")))
-    print(f"Wrote {len(out)} rows to {OUT}")
+    print(f"Wrote {len(out)} rows to {OUT} ({sum(1 for r in out if r.get('cameraIn')) } with camera data)")
 
 
 if __name__ == "__main__":

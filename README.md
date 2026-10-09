@@ -1,6 +1,6 @@
 # Timesheets & Camera Hours
 
-Web app for reviewing employee timesheets and camera hours from `Employee_Timesheets_App.xlsx` (sheet `Shiftlab`).
+Web app for reviewing employee timesheets and camera hours from two raw reports: `AttendanceReport.xlsx` (shift lab data) and `CameraReport.xlsx` (camera data, employee shown as `NAME (number)`). Camera columns are matched to attendance rows by employee name + date.
 
 ## Run
 
@@ -11,12 +11,12 @@ npm start        # http://localhost:3000
 npm test         # parsing/formatting tests
 ```
 
-The app reads `data/timesheets.json`, which is already generated from the workbook. Click a column header to sort; filter by employee name and date range. Blank values show as `—`.
+The app reads `data/timesheets.json`, which is already generated from the two reports. Click a column header to sort; filter by employee name and date range. Blank values show as `—`.
 
-## Refresh data from the workbook
+## Refresh data from the two reports
 
 ```
-pip install openpyxl
+pip install openpyxl   # put AttendanceReport.xlsx and CameraReport.xlsx in the repo root
 npm run convert
 ```
 
