@@ -1,4 +1,4 @@
-import { filterRows, filterDistrictRows, summarizeEmployees, sortRows, formatClock, formatCamera, formatDate, formatNumber, formatDuration } from "./lib.js";
+import { filterRows, filterDistrictRows, summarizeEmployees, sortRows, formatClock, formatCamera, formatDate, formatNumber, formatDuration } from "./lib.js?v=2";
 
 const COLUMNS = [
   ["employee", "Employee", (v) => v || "—"],
