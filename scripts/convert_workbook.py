@@ -2,7 +2,7 @@
 """Build data/timesheets.json from two raw reports in the repo root:
 
   AttendanceReport.xlsx - shift lab data (no camera columns)
-  CameraReport.xlsx     - camera data; Employee looks like "NAME (12345)"
+  CameraReport.xlsx/.xls - camera data; Employee looks like "NAME (12345)"
 
 Camera columns are matched to attendance rows by employee name + date.
 
@@ -20,7 +20,7 @@ import openpyxl
 warnings.filterwarnings("ignore")
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 ATTENDANCE = ROOT / "AttendanceReport.xlsx"
-CAMERA = ROOT / "CameraReport.xlsx"
+CAMERA = next((p for p in (ROOT / "CameraReport.xlsx", ROOT / "CameraReport.xls") if p.exists()), ROOT / "CameraReport.xlsx")
 OUT = ROOT / "data" / "timesheets.json"
 
 FIELDS = {
@@ -57,7 +57,30 @@ def norm_name(v):
     return " ".join(name.split()).upper()
 
 
+def read_xls(path):
+    """Legacy .xls: yield rows with dates/times converted like openpyxl does."""
+    import xlrd
+
+    book = xlrd.open_workbook(path)
+    sheet = book.sheet_by_index(0)
+    for i in range(sheet.nrows):
+        row = []
+        for c in sheet.row(i):
+            if c.ctype == xlrd.XL_CELL_DATE:
+                d = xlrd.xldate_as_datetime(c.value, book.datemode)
+                row.append(d.time() if c.value < 1 else d)
+            elif c.ctype in (xlrd.XL_CELL_EMPTY, xlrd.XL_CELL_BLANK, xlrd.XL_CELL_ERROR):
+                row.append(None)
+            else:
+                row.append(c.value)
+        yield tuple(row)
+
+
 def read_sheet(path):
+    if str(path).lower().endswith(".xls"):
+        rows = read_xls(path)
+        headers = [str(h).strip() if h else "" for h in next(rows)]
+        return headers, rows
     ws = openpyxl.load_workbook(path, data_only=True).worksheets[0]
     rows = ws.iter_rows(values_only=True)
     headers = [str(h).strip() if h else "" for h in next(rows)]

@@ -1,6 +1,6 @@
 # Timesheets & Camera Hours
 
-Web app for reviewing employee timesheets and camera hours from two raw reports: `AttendanceReport.xlsx` (shift lab data) and `CameraReport.xlsx` (camera data, employee shown as `NAME (number)`). Camera columns are matched to attendance rows by employee name + date.
+Web app for reviewing employee timesheets and camera hours from two raw reports: `AttendanceReport.xlsx` (shift lab data) and `CameraReport.xlsx` or `.xls` (camera data, employee shown as `NAME (number)`). Camera columns are matched to attendance rows by employee name + date.
 
 ## Run
 
