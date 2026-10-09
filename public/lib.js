@@ -58,6 +58,54 @@ export function filterRows(rows, { employee = "", from = "", to = "" } = {}) {
   });
 }
 
+/** Filter district summaries by their source row's district, store, title, and inclusive date range. */
+export function filterDistrictRows(rows, { district = "", store = "", title = "", from = "", to = "" } = {}) {
+  return rows.filter((r) => {
+    const d = (r.date || "").slice(0, 10);
+    return (!district || r.district === district) &&
+      (!store || r.store === store) &&
+      (!title || r.title === title) &&
+      (!from || d >= from) && (!to || d <= to);
+  });
+}
+
+/** Sum time data across the selected rows for each employee. Durations are aggregated in minutes. */
+export function summarizeEmployees(rows) {
+  const employees = new Map();
+  for (const row of rows) {
+    if (!row.employee) continue;
+    let summary = employees.get(row.employee);
+    if (!summary) {
+      summary = {
+        employee: row.employee,
+        hoursScheduled: 0,
+        hoursWorked: 0,
+        totalMinutes: 0,
+        showroomMinutes: 0,
+        backroomMinutes: 0,
+      };
+      employees.set(row.employee, summary);
+    }
+    summary.hoursScheduled += Number(row.hoursScheduled) || 0;
+    summary.hoursWorked += Number(row.hoursWorked) || 0;
+    summary.totalMinutes += durationToMinutes(row.totalTime) || 0;
+    summary.showroomMinutes += durationToMinutes(row.showroomTime) || 0;
+    summary.backroomMinutes += durationToMinutes(row.backroomTime) || 0;
+  }
+  return [...employees.values()].map((summary) => ({
+    ...summary,
+    totalTime: formatMinutes(summary.totalMinutes),
+    showroomTime: formatMinutes(summary.showroomMinutes),
+    showroomPercent: summary.totalMinutes ? summary.showroomMinutes / summary.totalMinutes * 100 : null,
+    backroomTime: formatMinutes(summary.backroomMinutes),
+    backroomPercent: summary.totalMinutes ? summary.backroomMinutes / summary.totalMinutes * 100 : null,
+  }));
+}
+
+function formatMinutes(minutes) {
+  return `${Math.floor(minutes / 60)}:${String(minutes % 60).padStart(2, "0")}`;
+}
+
 /** Sort a copy by key; blanks always last. Dates/durations/numbers compared numerically. */
 export function sortRows(rows, key, dir = "asc") {
   const val = (r) => {

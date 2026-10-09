@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import { formatClock, formatCamera, formatDate, formatNumber, formatDuration, durationToMinutes, filterRows, sortRows } from "../public/lib.js";
+import { formatClock, formatCamera, formatDate, formatNumber, formatDuration, durationToMinutes, filterRows, filterDistrictRows, summarizeEmployees, sortRows } from "../public/lib.js";
 
 test("formatClock", () => {
   assert.equal(formatClock("09:30:00"), "9:30 AM");
@@ -39,6 +39,32 @@ test("filter and sort", () => {
   assert.equal(filterRows(rows, { from: "2026-10-02", to: "2026-10-02" }).length, 1);
   assert.deepEqual(sortRows(rows, "hoursWorked", "desc").map((r) => r.employee), ["AB", "B", "A"]);
   assert.deepEqual(sortRows(rows, "hoursWorked", "asc").map((r) => r.employee), ["B", "AB", "A"]);
+});
+
+test("district filters and employee summaries", () => {
+  const rows = [
+    { employee: "A", district: "North", store: "One", title: "Associate", date: "2026-10-01", hoursScheduled: 8, hoursWorked: 7, totalTime: "6:00", showroomTime: "4:30", backroomTime: "1:30" },
+    { employee: "A", district: "North", store: "One", title: "Associate", date: "2026-10-02", hoursScheduled: 8, hoursWorked: 8, totalTime: "7:00", showroomTime: "5:00", backroomTime: "2:00" },
+    { employee: "B", district: "South", store: "Two", title: "Lead", date: "2026-10-01", hoursScheduled: 8, hoursWorked: 8, totalTime: null, showroomTime: null, backroomTime: null },
+  ];
+  assert.equal(filterDistrictRows(rows, { district: "North", store: "One", title: "Associate", from: "2026-10-02" }).length, 1);
+  assert.deepEqual(summarizeEmployees(rows.slice(0, 2)), [{
+    employee: "A",
+    hoursScheduled: 16,
+    hoursWorked: 15,
+    totalMinutes: 780,
+    showroomMinutes: 570,
+    backroomMinutes: 210,
+    totalTime: "13:00",
+    showroomTime: "9:30",
+    showroomPercent: 570 / 780 * 100,
+    backroomTime: "3:30",
+    backroomPercent: 210 / 780 * 100,
+  }]);
+  const noCameraTime = summarizeEmployees([rows[2]])[0];
+  assert.equal(noCameraTime.totalTime, "0:00");
+  assert.equal(noCameraTime.showroomPercent, null);
+  assert.equal(noCameraTime.backroomPercent, null);
 });
 
 test("generated data is well formed", () => {
