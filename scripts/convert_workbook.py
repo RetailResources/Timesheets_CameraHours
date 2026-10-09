@@ -22,6 +22,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 ATTENDANCE = ROOT / "AttendanceReport.xlsx"
 CAMERA = next((p for p in (ROOT / "CameraReport.xlsx", ROOT / "CameraReport.xls") if p.exists()), ROOT / "CameraReport.xlsx")
 OUT = ROOT / "data" / "timesheets.json"
+REPORT_DATES = ROOT / "data" / "report-dates.json"
 
 FIELDS = {
     "Area Name": "area", "District Name": "district", "Store": "store",
@@ -87,6 +88,13 @@ def read_sheet(path):
     return headers, rows
 
 
+def latest_report_date(path):
+    headers, rows = read_sheet(path)
+    date_col = headers.index("Date")
+    dates = (str(value)[:10] for row in rows if (value := conv(row[date_col])))
+    return max(dates, default=None)
+
+
 def read_camera(path):
     headers, rows = read_sheet(path)
     # Prefer the column whose values carry the employee number; any name column works since numbers are stripped.
@@ -122,6 +130,10 @@ def main():
                 rec.setdefault(k, None)
             out.append(rec)
     OUT.write_text(json.dumps(out, separators=(",", ":")))
+    REPORT_DATES.write_text(json.dumps({
+        "attendance": latest_report_date(att),
+        "camera": latest_report_date(cam),
+    }, separators=(",", ":")))
     print(f"Wrote {len(out)} rows to {OUT} ({sum(1 for r in out if r.get('cameraIn')) } with camera data)")
 
 
