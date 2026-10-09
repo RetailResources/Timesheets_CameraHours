@@ -58,7 +58,7 @@ function render() {
 
 async function init() {
   try {
-    const res = await fetch("/data/timesheets.json");
+    const res = await fetch("data/timesheets.json");
     if (!res.ok) throw new Error(res.statusText);
     state.rows = await res.json();
   } catch (e) {

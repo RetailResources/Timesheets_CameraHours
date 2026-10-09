@@ -19,3 +19,8 @@ The app reads `data/timesheets.json`, which is already generated from the workbo
 pip install openpyxl
 npm run convert
 ```
+
+## Deploy
+
+Pushing to `main` deploys `public/` + `data/` to GitHub Pages via `.github/workflows/pages.yml`:
+https://retailresources.github.io/Timesheets_CameraHours/ (set Settings → Pages → Source to "GitHub Actions").
