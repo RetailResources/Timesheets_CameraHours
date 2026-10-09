@@ -72,10 +72,6 @@ def read_camera(path):
     lookup = {}
     for r in rows:
         rec = {CAMERA_FIELDS[h]: conv(v) for h, v in zip(headers, r) if h in CAMERA_FIELDS}
-        if "Location" in headers:
-            loc = conv(r[headers.index("Location")])
-            if loc:
-                rec["store"] = re.sub(r"^\s*\w+\s*:\s*", "", str(loc))  # "5564: Golden Triangle" -> "Golden Triangle"
         date = conv(r[date_col])
         names = [norm_name(r[i]) for i in name_cols if r[i]]
         if not names or not date:
@@ -99,7 +95,7 @@ def main():
             match = camera.get((norm_name(rec["employee"]), str(rec["date"])[:10]), {})
             for k, v in match.items():
                 rec.setdefault(k, v)
-            for k in [*CAMERA_FIELDS.values(), "store"]:
+            for k in CAMERA_FIELDS.values():
                 rec.setdefault(k, None)
             out.append(rec)
     OUT.write_text(json.dumps(out, separators=(",", ":")))
