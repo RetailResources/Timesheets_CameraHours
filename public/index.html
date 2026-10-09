@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Employee Timesheets</title>
+  <title>Timesheets &amp; Camera Hours</title>
   <style>
     body { font: 14px system-ui, sans-serif; margin: 0; color: #1f2937; background: #f3f4f6; }
     header { background: #111827; color: #fff; padding: 12px 20px; }
@@ -11,6 +11,8 @@
     .bar { display: flex; gap: 12px; align-items: end; flex-wrap: wrap; padding: 12px 20px; }
     label { display: flex; flex-direction: column; font-size: 12px; gap: 2px; }
     input, button { padding: 6px 8px; font: inherit; }
+    button[aria-pressed="true"] { background: #1f2937; color: #fff; }
+    [hidden] { display: none !important; }
     .wrap { overflow: auto; max-height: calc(100vh - 140px); margin: 0 20px 20px; background: #fff; border: 1px solid #d1d5db; }
     table { border-collapse: collapse; width: 100%; white-space: nowrap; }
     th, td { padding: 6px 10px; border-bottom: 1px solid #e5e7eb; text-align: left; }
@@ -21,9 +23,14 @@
   </style>
 </head>
 <body>
-  <header><h1>Employee Timesheets &amp; Camera Hours</h1></header>
+  <header><h1 id="title">Employee Timesheets &amp; Camera Hours</h1></header>
   <div class="bar">
-    <label>Employee <input id="employee" type="search" placeholder="Search name"></label>
+    <button id="employee-mode" type="button" aria-pressed="true">Employee mode</button>
+    <button id="district-mode" type="button" aria-pressed="false">District mode</button>
+    <label id="employee-filter">Employee <input id="employee" type="search" placeholder="Search name"></label>
+    <label id="district-filter" hidden>District <select id="district"><option value="">All districts</option></select></label>
+    <label id="store-filter" hidden>Store <select id="store"><option value="">All stores</option></select></label>
+    <label id="title-filter" hidden>Title <select id="job-title"><option value="">All titles</option></select></label>
     <label>From <input id="from" type="date"></label>
     <label>To <input id="to" type="date"></label>
     <button id="clear" type="button">Clear</button>
