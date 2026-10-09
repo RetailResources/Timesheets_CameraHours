@@ -1,4 +1,4 @@
-import { filterRows, filterDistrictRows, summarizeEmployees, sortRows, formatClock, formatCamera, formatDate, formatNumber, formatDuration } from "./lib.js?v=2";
+import { filterRows, filterDistrictRows, summarizeEmployees, totalRows, sortRows, formatClock, formatCamera, formatDate, formatNumber, formatDuration } from "./lib.js?v=3";
 
 const COLUMNS = [
   ["employee", "Employee", (v) => v || "—"],
@@ -52,7 +52,7 @@ function setMode(mode) {
   $("district-mode").setAttribute("aria-pressed", String(district));
   $("employee-filter").hidden = district;
   for (const id of ["district-filter", "store-filter", "title-filter"]) $(id).hidden = !district;
-  $("title").textContent = district ? "District Timesheets & Camera Hours" : "Employee Timesheets & Camera Hours";
+  $("title").textContent = district ? "Employee Hours Summary" : "Employee Timesheets & Camera Hours";
   state.key = district ? "employee" : "date";
   state.dir = "asc";
   render();
@@ -100,6 +100,21 @@ function render() {
     frag.appendChild(tr);
   }
   $("body").replaceChildren(frag);
+  const foot = $("foot");
+  foot.replaceChildren();
+  if (!district) {
+    const totals = totalRows(rows);
+    const tr = document.createElement("tr");
+    columns.forEach(([key, , fmt], i) => {
+      const td = document.createElement("td");
+      if (key in totals) {
+        td.textContent = fmt(totals[key]);
+        td.classList.add("num");
+      } else if (i === 0) td.textContent = "Total";
+      tr.appendChild(td);
+    });
+    foot.appendChild(tr);
+  }
 }
 
 async function init() {
