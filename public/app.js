@@ -126,6 +126,14 @@ async function init() {
     $("count").textContent = "Could not load data/timesheets.json: " + e.message;
     return;
   }
+  try {
+    const res = await fetch("data/report-dates.json");
+    if (res.ok) {
+      const dates = await res.json();
+      $("data-through").textContent = `Attendance Data Thru ${formatDate(dates.attendance)} · Camera Data Thru ${formatDate(dates.camera)}`;
+      $("data-through").hidden = false;
+    }
+  } catch {}
   for (const id of ["employee", "from", "to"]) $(id).addEventListener("input", render);
   for (const id of ["district", "store", "job-title"]) $(id).addEventListener("change", render);
   populateSelect("district", "district", "districts");

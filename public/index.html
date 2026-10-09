@@ -8,6 +8,7 @@
     body { font: 14px system-ui, sans-serif; margin: 0; color: #1f2937; background: #f3f4f6; }
     header { background: #111827; color: #fff; padding: 12px 20px; }
     h1 { font-size: 18px; margin: 0; }
+    .data-through { margin: 3px 0 0; color: #d1d5db; font-size: 11px; }
     .bar { display: flex; gap: 12px; align-items: end; flex-wrap: wrap; padding: 12px 20px; }
     label { display: flex; flex-direction: column; font-size: 12px; gap: 2px; }
     input, button { padding: 6px 8px; font: inherit; }
@@ -24,7 +25,10 @@
   </style>
 </head>
 <body>
-  <header><h1 id="title">Employee Timesheets &amp; Camera Hours</h1></header>
+  <header>
+    <h1 id="title">Employee Timesheets &amp; Camera Hours</h1>
+    <p id="data-through" class="data-through" hidden></p>
+  </header>
   <div class="bar">
     <button id="employee-mode" type="button" aria-pressed="true">Employee Details</button>
     <button id="district-mode" type="button" aria-pressed="false">Employee Summary</button>
@@ -38,6 +42,6 @@
     <span id="count"></span>
   </div>
   <div class="wrap"><table><thead><tr id="head"></tr></thead><tbody id="body"></tbody><tfoot id="foot"></tfoot></table></div>
-  <script type="module" src="app.js?v=3"></script>
+  <script type="module" src="app.js?v=4"></script>
 </body>
 </html>
