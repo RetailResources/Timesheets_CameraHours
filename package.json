@@ -1,0 +1,11 @@
+{
+  "name": "timesheets-camera-hours",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "convert": "python3 scripts/convert_workbook.py",
+    "test": "node --test test/*.test.js"
+  }
+}
