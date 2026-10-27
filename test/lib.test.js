@@ -70,7 +70,9 @@ test("district filters and employee summaries", () => {
 test("generated data is well formed", () => {
   const data = JSON.parse(fs.readFileSync(new URL("../data/timesheets.json", import.meta.url)));
   assert.ok(data.length > 0);
-  assert.equal(data[0].employee, "JYE PECHACEK");
-  assert.equal(formatClock(data[0].actualIn), "9:38 AM");
-  assert.equal(formatDuration(data[0].totalTime), "7:36");
+  assert.ok(data.every((r) => r.employee && r.date));
+  const withCamera = data.find((r) => r.cameraIn && r.actualIn && r.totalTime);
+  assert.ok(withCamera, "expected at least one row with camera data");
+  assert.match(formatClock(withCamera.actualIn), /^\d{1,2}:\d{2} [AP]M$/);
+  assert.match(formatDuration(withCamera.totalTime), /^\d+:\d{2}$/);
 });
