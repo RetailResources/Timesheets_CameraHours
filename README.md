@@ -1,6 +1,6 @@
 # Timesheets & Camera Hours
 
-Web app for reviewing employee timesheets and camera hours from two raw reports: `AttendanceReport.xlsx` (shift lab data) and `CameraReport.xlsx` or `.xls` (camera data, employee shown as `NAME (number)`). Camera columns are matched to attendance rows by employee name + date.
+Web app for reviewing employee timesheets and camera hours from two raw reports: `AttendanceReport.xlsx` (shift lab data) and `CameraReport.xlsx` or `.xls` (camera data, employee shown as `NAME (number)`). Camera columns are matched by employee name, date, and store; the location code before `:` in camera reports is ignored. Missing or ambiguous matches leave camera data blank, rather than assigning data from another store.
 
 ## Run
 
@@ -16,9 +16,11 @@ The app reads `data/timesheets.json`, which is already generated from the two re
 ## Refresh data from the two reports
 
 ```
-pip install openpyxl   # put AttendanceReport.xlsx and CameraReport.xlsx in the repo root
+pip install openpyxl xlrd   # put AttendanceReport.xlsx and CameraReport.xlsx or .xls in the repo root
 npm run convert
 ```
+
+Run converter tests with `python3 -m unittest discover -s test -p 'test_*.py'`.
 
 ## Deploy
 

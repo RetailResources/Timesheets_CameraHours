@@ -3,6 +3,7 @@ import { filterRows, filterDistrictRows, summarizeEmployees, totalRows, sortRows
 const COLUMNS = [
   ["employee", "Employee", (v) => v || "—"],
   ["date", "Date", formatDate],
+  ["store", "Store", (v) => v || "—"],
   ["scheduledIn", "Scheduled In", formatClock],
   ["scheduledOut", "Scheduled Out", formatClock],
   ["actualIn", "Actual In", formatClock],

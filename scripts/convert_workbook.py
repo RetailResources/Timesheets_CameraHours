@@ -4,7 +4,7 @@
   AttendanceReport.xlsx - shift lab data (no camera columns)
   CameraReport.xlsx/.xls - camera data; Employee looks like "NAME (12345)"
 
-Camera columns are matched to attendance rows by employee name + date.
+Camera columns are matched to attendance rows by employee name, date, and store.
 
 Usage: pip install openpyxl && python3 scripts/convert_workbook.py [attendance.xlsx camera.xlsx]
 """
@@ -58,6 +58,12 @@ def norm_name(v):
     return " ".join(name.split()).upper()
 
 
+def norm_store(v):
+    """Normalize a store name, removing the camera report's location code."""
+    name = re.sub(r"^\s*[^:]+:\s*", "", str(v or ""))
+    return " ".join(name.split()).casefold()
+
+
 def read_xls(path):
     """Legacy .xls: yield rows with dates/times converted like openpyxl does."""
     import xlrd
@@ -97,20 +103,21 @@ def latest_report_date(path):
 
 def read_camera(path):
     headers, rows = read_sheet(path)
-    # Prefer the column whose values carry the employee number; any name column works since numbers are stripped.
     name_cols = [i for i, h in enumerate(headers) if h.lower().startswith("employee")]
     date_col = headers.index("Date")
+    location_col = headers.index("Location")
     lookup = {}
     for r in rows:
         rec = {CAMERA_FIELDS[h]: conv(v) for h, v in zip(headers, r) if h in CAMERA_FIELDS}
         date = conv(r[date_col])
-        names = [norm_name(r[i]) for i in name_cols if r[i]]
-        if not names or not date:
+        store = norm_store(r[location_col])
+        names = {norm_name(r[i]) for i in name_cols if r[i]}
+        if not names or not date or not store:
             continue
-        # Use the first name column for the key; fall back to the others if absent.
-        key = (names[-1], str(date)[:10])
-        lookup.setdefault(key, rec)
-        lookup.setdefault((names[0], str(date)[:10]), rec)
+        for name in names:
+            key = (name, str(date)[:10], store)
+            # Multiple camera records for the same key cannot be matched safely.
+            lookup[key] = rec if key not in lookup else None
     return lookup
 
 
@@ -120,11 +127,15 @@ def main():
     camera = read_camera(cam)
     headers, rows = read_sheet(att)
     out = []
+    ambiguous = 0
     for r in rows:
         rec = {FIELDS[h]: conv(v) for h, v in zip(headers, r) if h in FIELDS}
         if rec.get("employee") and rec.get("date"):
-            match = camera.get((norm_name(rec["employee"]), str(rec["date"])[:10]), {})
-            for k, v in match.items():
+            key = (norm_name(rec["employee"]), str(rec["date"])[:10], norm_store(rec.get("store")))
+            match = camera.get(key)
+            if key in camera and match is None:
+                ambiguous += 1
+            for k, v in (match or {}).items():
                 rec.setdefault(k, v)
             for k in CAMERA_FIELDS.values():
                 rec.setdefault(k, None)
@@ -135,6 +146,8 @@ def main():
         "camera": latest_report_date(cam),
     }, separators=(",", ":")))
     print(f"Wrote {len(out)} rows to {OUT} ({sum(1 for r in out if r.get('cameraIn')) } with camera data)")
+    if ambiguous:
+        print(f"Warning: {ambiguous} attendance rows have ambiguous camera matches; camera data was left blank.", file=sys.stderr)
 
 
 if __name__ == "__main__":
