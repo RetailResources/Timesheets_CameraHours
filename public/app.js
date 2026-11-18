@@ -1,5 +1,5 @@
 import { filterRows, filterDistrictRows, summarizeEmployees, totalRows, sortRows, formatClock, formatCamera, formatDate, formatNumber, formatDuration } from "./lib.js?v=4";
-import { filterScheduleRows, scheduleWeeks, summarizeSchedules, scheduleCounts } from "./schedules.js?v=1";
+import { filterScheduleRows, scheduleWeeks, summarizeSchedules, scheduleCounts } from "./schedules.js?v=2";
 
 const COLUMNS = [
   ["employee", "Employee", (v) => v || "—"],
@@ -67,6 +67,8 @@ function setMode(mode) {
 
 function render() {
   document.querySelectorAll(".schedule-subhead").forEach((row) => row.remove());
+  $("head").classList.remove("schedule-head");
+  $("body").closest("table").classList.toggle("schedule-table", state.mode === "schedule");
   if (state.mode === "schedule") {
     renderSchedules();
     return;
@@ -173,6 +175,7 @@ function renderSchedules() {
     parent.appendChild(th);
     return th;
   };
+  head.classList.add("schedule-head");
   header("District", 1, head);
   header("Employee", 1, head);
   for (const week of weeks) header(`${formatDate(week.start)} – ${formatDate(week.end)}`, 4, head).className = "week-head";

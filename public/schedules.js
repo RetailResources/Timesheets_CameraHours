@@ -11,9 +11,10 @@ function addDays(date, days) {
   return result;
 }
 
+/** Previous week, current week, and next week; weeks run Sunday through Saturday. */
 export function scheduleWeeks(today = new Date()) {
   const sunday = addDays(today, -today.getDay());
-  return [0, 7, 14].map((offset) => {
+  return [-7, 0, 7].map((offset) => {
     const start = addDays(sunday, offset);
     return {
       start: dateString(start),

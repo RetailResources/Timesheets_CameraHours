@@ -29,6 +29,10 @@
     .multi-options label { flex-direction: row; align-items: center; padding: 2px; white-space: nowrap; }
     .schedule-note { margin: 0 20px 10px; font-size: 12px; }
     .week-head { background: #c2185b; color: white; cursor: default; }
+    .schedule-table { width: auto; }
+    .schedule-table th, .schedule-table tfoot td { white-space: normal; width: 1%; line-height: 1.15; padding: 6px 8px; }
+    .schedule-table .week-head { white-space: nowrap; width: auto; }
+    .schedule-table th:first-child, .schedule-table th:nth-child(2) { width: auto; }
     .schedule-subhead th { position: static; cursor: default; }
     .schedule-good { color: #006400; font-weight: 700; }
     .schedule-bad { color: #a00000; font-weight: 700; }
@@ -57,6 +61,6 @@
   </div>
   <p id="schedule-note" class="schedule-note" hidden></p>
   <div class="wrap"><table><thead><tr id="head"></tr></thead><tbody id="body"></tbody><tfoot id="foot"></tfoot></table></div>
-  <script type="module" src="app.js?v=8"></script>
+  <script type="module" src="app.js?v=9"></script>
 </body>
 </html>
