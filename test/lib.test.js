@@ -50,6 +50,7 @@ test("district filters and employee summaries", () => {
   assert.equal(filterDistrictRows(rows, { district: "North", store: "One", title: "Associate", from: "2026-10-02" }).length, 1);
   assert.deepEqual(summarizeEmployees(rows.slice(0, 2)), [{
     employee: "A",
+    title: "Associate",
     hoursScheduled: 16,
     hoursWorked: 15,
     totalMinutes: 780,
@@ -65,6 +66,22 @@ test("district filters and employee summaries", () => {
   assert.equal(noCameraTime.totalTime, "0:00");
   assert.equal(noCameraTime.showroomPercent, null);
   assert.equal(noCameraTime.backroomPercent, null);
+});
+
+test("employee summaries display distinct titles without splitting totals", () => {
+  const rows = [
+    { employee: "A", title: "Lead", hoursWorked: 3 },
+    { employee: "A", title: "Associate", hoursWorked: 4 },
+    { employee: "A", title: " Lead ", hoursWorked: 2 },
+    { employee: "A", title: "", hoursWorked: 1 },
+    { employee: "B", hoursWorked: 2 },
+  ];
+  const result = summarizeEmployees(rows);
+  assert.equal(result.length, 2);
+  assert.equal(result[0].title, "Associate, Lead");
+  assert.equal(result[0].hoursWorked, 10);
+  assert.equal(result[1].title, "");
+  assert.equal(filterDistrictRows(rows, { title: "Lead" }).length, 1);
 });
 
 test("generated data is well formed", () => {

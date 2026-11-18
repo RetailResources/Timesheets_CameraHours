@@ -78,6 +78,7 @@ export function summarizeEmployees(rows) {
     if (!summary) {
       summary = {
         employee: row.employee,
+        titles: new Set(),
         hoursScheduled: 0,
         hoursWorked: 0,
         totalMinutes: 0,
@@ -86,14 +87,16 @@ export function summarizeEmployees(rows) {
       };
       employees.set(row.employee, summary);
     }
+    if (row.title && row.title.trim()) summary.titles.add(row.title.trim());
     summary.hoursScheduled += Number(row.hoursScheduled) || 0;
     summary.hoursWorked += Number(row.hoursWorked) || 0;
     summary.totalMinutes += durationToMinutes(row.totalTime) || 0;
     summary.showroomMinutes += durationToMinutes(row.showroomTime) || 0;
     summary.backroomMinutes += durationToMinutes(row.backroomTime) || 0;
   }
-  return [...employees.values()].map((summary) => ({
+  return [...employees.values()].map(({ titles, ...summary }) => ({
     ...summary,
+    title: [...titles].sort((a, b) => a.localeCompare(b)).join(", "),
     totalTime: formatMinutes(summary.totalMinutes),
     showroomTime: formatMinutes(summary.showroomMinutes),
     showroomPercent: summary.totalMinutes ? summary.showroomMinutes / summary.totalMinutes * 100 : null,

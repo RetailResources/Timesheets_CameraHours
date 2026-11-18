@@ -1,4 +1,4 @@
-import { filterRows, filterDistrictRows, summarizeEmployees, totalRows, sortRows, formatClock, formatCamera, formatDate, formatNumber, formatDuration } from "./lib.js?v=3";
+import { filterRows, filterDistrictRows, summarizeEmployees, totalRows, sortRows, formatClock, formatCamera, formatDate, formatNumber, formatDuration } from "./lib.js?v=4";
 
 const COLUMNS = [
   ["employee", "Employee", (v) => v || "—"],
@@ -20,6 +20,7 @@ const COLUMNS = [
 ];
 const NUMERIC = new Set(["hoursScheduled", "hoursWorked", "breakMinutes"]);
 const DISTRICT_COLUMNS = [
+  ["title", "Title", (v) => v || "—"],
   ["employee", "Employee", (v) => v || "—"],
   ["hoursScheduled", "Hours Scheduled", formatNumber],
   ["hoursWorked", "Hours Worked", formatNumber],

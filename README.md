@@ -13,6 +13,8 @@ npm test         # parsing/formatting tests
 
 The app reads `data/timesheets.json`, which is already generated from the two reports. Click a column header to sort; filter by employee name and date range. Blank values show as `—`.
 
+The employee summary shows each employee's distinct titles from the filtered rows in its first column, while retaining one summary row per employee.
+
 ## Refresh data from the two reports
 
 ```
