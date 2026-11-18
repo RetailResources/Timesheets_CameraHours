@@ -56,17 +56,7 @@ export function summarizeSchedules(rows, weeks, coverage) {
         return date >= week.start && date <= week.end;
       });
       const scheduled = selected.reduce((sum, row) => sum + (numberOrNull(row.hoursScheduled) ?? 0), 0);
-      const workedShifts = new Set();
-      const worked = selected.reduce((sum, row) => {
-        const hours = numberOrNull(row.hoursWorked);
-        if (hours === null) return sum;
-        if (row.actualIn && row.actualOut) {
-          const key = JSON.stringify([(row.date || "").slice(0, 10), row.store, row.actualIn, row.actualOut, hours]);
-          if (workedShifts.has(key)) return sum;
-          workedShifts.add(key);
-        }
-        return sum + hours;
-      }, 0);
+      const worked = selected.reduce((sum, row) => sum + (numberOrNull(row.hoursWorked) ?? 0), 0);
       const isScheduled = (date) => {
         if (!covered(date)) return null;
         return selected.some((row) => (row.date || "").slice(0, 10) === date &&

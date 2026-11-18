@@ -1,5 +1,5 @@
 import { filterRows, filterDistrictRows, summarizeEmployees, totalRows, sortRows, formatClock, formatCamera, formatDate, formatNumber, formatDuration } from "./lib.js?v=4";
-import { filterScheduleRows, scheduleWeeks, summarizeSchedules, scheduleCounts } from "./schedules.js?v=2";
+import { filterScheduleRows, scheduleWeeks, summarizeSchedules, scheduleCounts } from "./schedules.js?v=3";
 
 const COLUMNS = [
   ["employee", "Employee", (v) => v || "—"],
