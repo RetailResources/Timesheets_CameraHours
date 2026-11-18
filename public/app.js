@@ -69,6 +69,7 @@ function render() {
   document.querySelectorAll(".schedule-subhead").forEach((row) => row.remove());
   $("head").classList.remove("schedule-head");
   $("body").closest("table").classList.toggle("schedule-table", state.mode === "schedule");
+  $("body").closest("table").classList.toggle("summary-table", state.mode === "district");
   if (state.mode === "schedule") {
     renderSchedules();
     return;
