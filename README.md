@@ -15,6 +15,8 @@ The app reads `data/timesheets.json`, which is already generated from the two re
 
 The employee summary shows each employee's distinct titles from the filtered rows in its first column, while retaining one summary row per employee.
 
+The Schedules tab uses the attendance report for the current Sunday–Saturday week and the next two weeks. District, store, and title filters allow multiple selections; an empty selection includes all values. Rows group the report's employees by district, and the footer counts employees below 45 hours and not scheduled on Friday or Saturday. Days and full weeks outside the report's date range show `—` and are excluded from counts, rather than being treated as zero. Duplicate attendance rows with identical actual clock times, date, store, and worked hours count those worked hours once.
+
 ## Refresh data from the two reports
 
 ```

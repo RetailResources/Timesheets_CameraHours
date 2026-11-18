@@ -19,9 +19,19 @@
     th, td { padding: 6px 10px; border-bottom: 1px solid #e5e7eb; text-align: center; }
     th { position: sticky; top: 0; background: #e5e7eb; cursor: pointer; user-select: none; }
     tfoot td { position: sticky; bottom: 0; background: #e5e7eb; font-weight: 600; }
+    tfoot.schedule-footer td { position: static; }
     td.num { font-variant-numeric: tabular-nums; }
     td.blank { color: #9ca3af; }
     tbody tr:hover { background: #f9fafb; }
+    .multi-filter { position: relative; font-size: 12px; }
+    .multi-filter summary { cursor: pointer; border: 1px solid #9ca3af; background: white; padding: 6px 8px; }
+    .multi-options { position: absolute; z-index: 4; background: white; border: 1px solid #9ca3af; min-width: 180px; max-height: 240px; overflow: auto; padding: 6px; box-shadow: 0 2px 6px #0003; }
+    .multi-options label { flex-direction: row; align-items: center; padding: 2px; white-space: nowrap; }
+    .schedule-note { margin: 0 20px 10px; font-size: 12px; }
+    .week-head { background: #c2185b; color: white; cursor: default; }
+    .schedule-subhead th { position: static; cursor: default; }
+    .schedule-good { color: #006400; font-weight: 700; }
+    .schedule-bad { color: #a00000; font-weight: 700; }
   </style>
 </head>
 <body>
@@ -32,16 +42,21 @@
   <div class="bar">
     <button id="employee-mode" type="button" aria-pressed="true">Employee Details</button>
     <button id="district-mode" type="button" aria-pressed="false">Employee Summary</button>
+    <button id="schedule-mode" type="button" aria-pressed="false">Schedules</button>
     <label id="employee-filter">Employee <input id="employee" type="search" placeholder="Search name"></label>
     <label id="district-filter" hidden>District <select id="district"><option value="">All districts</option></select></label>
     <label id="store-filter" hidden>Store <select id="store"><option value="">All stores</option></select></label>
     <label id="title-filter" hidden>Title <select id="job-title"><option value="">All titles</option></select></label>
-    <label>From <input id="from" type="date"></label>
-    <label>To <input id="to" type="date"></label>
+    <details id="schedule-district-filter" class="multi-filter" hidden><summary>Districts</summary><div class="multi-options"></div></details>
+    <details id="schedule-store-filter" class="multi-filter" hidden><summary>Stores</summary><div class="multi-options"></div></details>
+    <details id="schedule-title-filter" class="multi-filter" hidden><summary>Titles</summary><div class="multi-options"></div></details>
+    <label id="from-filter">From <input id="from" type="date"></label>
+    <label id="to-filter">To <input id="to" type="date"></label>
     <button id="clear" type="button">Clear</button>
     <span id="count"></span>
   </div>
+  <p id="schedule-note" class="schedule-note" hidden></p>
   <div class="wrap"><table><thead><tr id="head"></tr></thead><tbody id="body"></tbody><tfoot id="foot"></tfoot></table></div>
-  <script type="module" src="app.js?v=6"></script>
+  <script type="module" src="app.js?v=7"></script>
 </body>
 </html>
