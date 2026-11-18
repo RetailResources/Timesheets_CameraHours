@@ -230,7 +230,7 @@ function renderSchedules() {
 
 async function init() {
   try {
-    const res = await fetch("data/timesheets.json");
+    const res = await fetch("data/timesheets.json", { cache: "no-cache" });
     if (!res.ok) throw new Error(res.statusText);
     state.rows = await res.json();
   } catch (e) {
@@ -238,7 +238,7 @@ async function init() {
     return;
   }
   try {
-    const res = await fetch("data/report-dates.json");
+    const res = await fetch("data/report-dates.json", { cache: "no-cache" });
     if (res.ok) {
       const dates = await res.json();
       $("data-through").textContent = `Attendance Data Thru ${formatDate(dates.attendance)} · Camera Data Thru ${formatDate(dates.camera)}`;
